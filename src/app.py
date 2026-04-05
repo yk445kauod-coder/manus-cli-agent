@@ -115,5 +115,9 @@ def handle_user_input(data):
     if user_input:
         agent.process_query(user_input)
 
+# تصدير التطبيق للنشر السحابي
+app = app
+socketio = socketio
+
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000, debug=True)
