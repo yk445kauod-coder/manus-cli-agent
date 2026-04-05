@@ -1,0 +1,8 @@
+openai
+rich
+click
+prompt_toolkit
+requests
+pydantic
+python-dotenv
+aiohttp
