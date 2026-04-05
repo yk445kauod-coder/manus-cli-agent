@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manus Web Agent - Permanent Deployment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --accent-color: #238636;
+            --terminal-header: #161b22;
+            --prompt-color: #58a6ff;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        #terminal {
+            flex: 1;
+            background-color: var(--bg-color);
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        #terminal-header {
+            background-color: var(--terminal-header);
+            padding: 10px 15px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #output {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .user-msg {
+            color: var(--prompt-color);
+            font-weight: bold;
+        }
+
+        .ai-msg {
+            color: var(--text-color);
+        }
+
+        .status-msg {
+            color: #8b949e;
+            font-style: italic;
+            font-size: 0.9em;
+        }
+
+        #input-area {
+            padding: 15px;
+            background-color: var(--terminal-header);
+            border-top: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+        }
+
+        #prompt {
+            color: var(--prompt-color);
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        #user-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-family: inherit;
+            font-size: 1em;
+            outline: none;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 18px;
+            background-color: var(--accent-color);
+            animation: blink 1s infinite;
+            vertical-align: middle;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Markdown Styling */
+        .ai-msg h1, .ai-msg h2, .ai-msg h3 { color: var(--prompt-color); }
+        .ai-msg code { background: #161b22; padding: 2px 4px; border-radius: 3px; }
+        .ai-msg pre { background: #161b22; padding: 10px; border-radius: 5px; overflow-x: auto; }
+
+        #api-key-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--terminal-header);
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            text-align: center;
+        }
+
+        .modal-content input {
+            padding: 10px;
+            width: 300px;
+            margin: 15px 0;
+            background: var(--bg-color);
+            border: 1px solid #30363d;
+            color: white;
+        }
+
+        .modal-content button {
+            padding: 10px 20px;
+            background: var(--accent-color);
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="api-key-modal">
+        <div class="modal-content">
+            <h3>أدخل مفتاح API الخاص بك (OpenAI-compatible)</h3>
+            <p>سيتم تخزين المفتاح محلياً في متصفحك فقط.</p>
+            <input type="password" id="api-key-input" placeholder="sk-...">
+            <br>
+            <button onclick="saveApiKey()">بدء الاستخدام</button>
+        </div>
+    </div>
+
+    <div id="terminal">
+        <div id="terminal-header">
+            <span><i class="fas fa-terminal"></i> Manus Web Agent - Permanent Deployment</span>
+            <div style="display: flex; gap: 8px;">
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #ff5f56;"></div>
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e;"></div>
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: #27c93f;"></div>
+            </div>
+        </div>
+        <div id="output">
+            <div class="message ai-msg">Welcome to Manus Web Agent. This is a permanent deployment on GitHub Pages.</div>
+        </div>
+        <div id="input-area">
+            <span id="prompt">manus-web ></span>
+            <input type="text" id="user-input" autofocus autocomplete="off">
+            <span class="cursor"></span>
+        </div>
+    </div>
+
+    <script>
+        let apiKey = localStorage.getItem('manus_api_key');
+        const output = document.getElementById('output');
+        const userInput = document.getElementById('user-input');
+        const modal = document.getElementById('api-key-modal');
+
+        if (apiKey) {
+            modal.style.display = 'none';
+        }
+
+        function saveApiKey() {
+            const input = document.getElementById('api-key-input').value;
+            if (input) {
+                localStorage.setItem('manus_api_key', input);
+                apiKey = input;
+                modal.style.display = 'none';
+            }
+        }
+
+        function appendMessage(content, type) {
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            if (type === 'ai-msg') {
+                div.innerHTML = marked.parse(content);
+            } else {
+                div.textContent = content;
+            }
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        async function callLLM(message) {
+            appendMessage(`[Thinking...]`, 'status-msg');
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        messages: [{ role: 'user', content: message }]
+                    })
+                });
+                const data = await response.json();
+                const aiResponse = data.choices[0].message.content;
+                appendMessage(aiResponse, 'ai-msg');
+            } catch (error) {
+                appendMessage(`Error: ${error.message}`, 'status-msg');
+            }
+        }
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const message = userInput.value.trim();
+                if (message) {
+                    appendMessage(`manus-web > ${message}`, 'user-msg');
+                    callLLM(message);
+                    userInput.value = '';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
