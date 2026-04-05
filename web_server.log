@@ -1,0 +1,62 @@
+/usr/local/lib/python3.11/dist-packages/engineio/async_drivers/eventlet.py:1: EventletDeprecationWarning: 
+Eventlet is deprecated. It is currently being maintained in bugfix mode, and
+we strongly recommend against using it for new projects.
+
+If you are already using Eventlet, we recommend migrating to a different
+framework.  For more detail see
+https://eventlet.readthedocs.io/en/latest/asyncio/migration.html
+
+  from eventlet.green.threading import Event
+Traceback (most recent call last):
+  File "/home/ubuntu/manus-cli-agent/src/app.py", line 106, in <module>
+    agent = WebAgent()
+            ^^^^^^^^^^
+  File "/home/ubuntu/manus-cli-agent/src/app.py", line 24, in __init__
+    self.skills = SkillManager(Config.SKILLS_DIR)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/manus-cli-agent/src/skills/manager.py", line 13, in __init__
+    self.load_skills()
+  File "/home/ubuntu/manus-cli-agent/src/skills/manager.py", line 28, in load_skills
+    self.skills[skill_folder] = self._parse_skill(skill_file)
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ubuntu/manus-cli-agent/src/skills/manager.py", line 41, in _parse_skill
+    metadata = yaml.safe_load(parts[1])
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/yaml/__init__.py", line 125, in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/yaml/__init__.py", line 81, in load
+    return loader.get_single_data()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/yaml/constructor.py", line 49, in get_single_data
+    node = self.get_single_node()
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/yaml/composer.py", line 36, in get_single_node
+    document = self.compose_document()
+               ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/yaml/composer.py", line 55, in compose_document
+    node = self.compose_node(None, None)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/yaml/composer.py", line 84, in compose_node
+    node = self.compose_mapping_node(anchor)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/yaml/composer.py", line 127, in compose_mapping_node
+    while not self.check_event(MappingEndEvent):
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/yaml/parser.py", line 98, in check_event
+    self.current_event = self.state()
+                         ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/yaml/parser.py", line 428, in parse_block_mapping_key
+    if self.check_token(KeyToken):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/yaml/scanner.py", line 116, in check_token
+    self.fetch_more_tokens()
+  File "/usr/local/lib/python3.11/dist-packages/yaml/scanner.py", line 223, in fetch_more_tokens
+    return self.fetch_value()
+           ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/dist-packages/yaml/scanner.py", line 577, in fetch_value
+    raise ScannerError(None, None,
+yaml.scanner.ScannerError: mapping values are not allowed here
+  in "<unicode string>", line 3, column 70:
+     ... ming and best practices. Use for: writing python code, debugging ... 
+                                         ^
